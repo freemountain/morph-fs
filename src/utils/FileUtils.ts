@@ -1,7 +1,6 @@
 ﻿import * as toAbsoluteGlob from "@dsherret/to-absolute-glob";
 import * as path from "path";
 import { FileSystemHost } from "../fileSystem";
-import isNegatedGlob = require("is-negated-glob");
 
 const isNullOrWhitespace = (str: string | undefined): str is undefined => {
     return typeof str !== "string" || str.trim().length === 0;
@@ -154,7 +153,6 @@ export class FileUtils {
      */
     static getParentMostPaths(paths: string[]) {
         const finalPaths: string[] = [];
-
 
         for (const fileOrDirPath of paths.sort((a, b) => a.length <= b.length ? -1 : 1)) {
             if (finalPaths.every(p => !FileUtils.pathStartsWith(fileOrDirPath, p)))
