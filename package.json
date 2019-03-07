@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "dopublish": "yarn run build && npm publish --otp",
+    "dopublish": "yarn run build && npm publish",
     "lint": "tslint \"src/**/*.ts\"",
     "build": "rimraf dist && tsc",
     "test": "TS_NODE_TRANSPILE_ONLY=\"true\" mocha --opts mocha.opts",
@@ -16,6 +16,9 @@
   "keywords": [
     "fs",
     "typescript"
+  ],
+  "files": [
+    "/dist"
   ],
   "author": "David Sherret",
   "license": "MIT",
