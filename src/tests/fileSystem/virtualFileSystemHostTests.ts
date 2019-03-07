@@ -2,20 +2,20 @@ import { expect } from "chai";
 import * as errors from "../../errors";
 import { VirtualFileSystemHost } from "../../fileSystem";
 
-describe(nameof(VirtualFileSystemHost), () => {
+describe("VirtualFileSystemHost", () => {
     describe("constructor", () => {
         it("should have the main directory after being constructed", () => {
             expect(new VirtualFileSystemHost().directoryExistsSync("/")).to.be.true;
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.getCurrentDirectory), () => {
+    describe("VirtualFileSystemHost.getCurrentDirectory", () => {
         it("should have a current directory of just a forward slash", () => {
             expect(new VirtualFileSystemHost().getCurrentDirectory()).to.equal("/");
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.deleteSync), () => {
+    describe("VirtualFileSystemHost.deleteSync)", () => {
         it("should delete a file", () => {
             const fs = new VirtualFileSystemHost();
             const filePath = "/dir/file.ts";
@@ -50,7 +50,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.delete), () => {
+    describe("VirtualFileSystemHost.delete", () => {
         // most tests done in deleteSync
         it("should delete a file", async () => {
             const fs = new VirtualFileSystemHost();
@@ -72,7 +72,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.readDirSync), () => {
+    describe("VirtualFileSystemHost.readDirSync", () => {
         it("should read a directory that exists", () => {
             const fs = new VirtualFileSystemHost();
             fs.writeFileSync("/dir/file.ts", "");
@@ -88,7 +88,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.readFileSync), () => {
+    describe("VirtualFileSystemHost.readFileSync", () => {
         it("should read a file that exists", () => {
             const fs = new VirtualFileSystemHost();
             const filePath = "/dir/file.ts";
@@ -103,7 +103,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.readFile), () => {
+    describe("VirtualFileSystemHost.readFile", () => {
         it("should read a file that exists", async () => {
             const fs = new VirtualFileSystemHost();
             const filePath = "/dir/file.ts";
@@ -124,7 +124,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.writeFileSync), () => {
+    describe("VirtualFileSystemHost.writeFileSync", () => {
         it("should write a file", () => {
             const fs = new VirtualFileSystemHost();
             const filePath = "/dir/file.ts";
@@ -151,7 +151,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.writeFile), () => {
+    describe("VirtualFileSystemHost.writeFile", () => {
         it("should write a file", async () => {
             const fs = new VirtualFileSystemHost();
             const filePath = "/dir/file.ts";
@@ -170,7 +170,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.mkdirSync), () => {
+    describe("VirtualFileSystemHost.mkdirSync", () => {
         it("should create the directory and all its parent directories", () => {
             const fs = new VirtualFileSystemHost();
             const path = "/dir/subdir";
@@ -180,7 +180,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.mkdir), () => {
+    describe("VirtualFileSystemHost.mkdir", () => {
         it("should create the directory and all its parent directories", async () => {
             const fs = new VirtualFileSystemHost();
             const path = "/dir/subdir";
@@ -190,7 +190,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.copy), () => {
+    describe("VirtualFileSystemHost.copy", () => {
         // this will test copySync because this calls copySync
 
         it("should copy a directory and all its sub directories", async () => {
@@ -260,7 +260,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.move), () => {
+    describe("VirtualFileSystemHost.move", () => {
         // this will test moveSync because this calls moveSync
 
         it("should move a directory and all its sub directories", async () => {
@@ -328,7 +328,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.fileExists), () => {
+    describe("VirtualFileSystemHost.fileExists", () => {
         const fs = new VirtualFileSystemHost();
         fs.writeFileSync("/file.ts", "");
 
@@ -341,7 +341,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.fileExistsSync), () => {
+    describe("VirtualFileSystemHost.fileExistsSync", () => {
         const fs = new VirtualFileSystemHost();
         fs.writeFileSync("/file.ts", "");
 
@@ -354,7 +354,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.directoryExists), () => {
+    describe("VirtualFileSystemHost.directoryExists", () => {
         const fs = new VirtualFileSystemHost();
         fs.mkdirSync("/dir");
 
@@ -367,7 +367,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.directoryExistsSync), () => {
+    describe("VirtualFileSystemHost.directoryExistsSync", () => {
         const fs = new VirtualFileSystemHost();
         fs.mkdirSync("/dir");
 
@@ -380,7 +380,7 @@ describe(nameof(VirtualFileSystemHost), () => {
         });
     });
 
-    describe(nameof<VirtualFileSystemHost>(h => h.glob), () => {
+    describe("VirtualFileSystemHost.glob", () => {
         const fs = new VirtualFileSystemHost();
         fs.writeFileSync("/dir/file1.ts", "");
         fs.writeFileSync("/dir/file1.d.ts", "");

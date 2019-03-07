@@ -1,14 +1,14 @@
 ﻿import * as errors from "../errors";
-import { ArrayUtils, FileUtils, KeyValueCache, matchGlobs } from "../utils";
+import { FileUtils, matchGlobs } from "../utils";
 import { FileSystemHost } from "./FileSystemHost";
 
 interface VirtualDirectory {
     path: string;
-    files: KeyValueCache<string, string>;
+    files: Map<string, string>;
 }
 
 export class VirtualFileSystemHost implements FileSystemHost {
-    private readonly directories = new KeyValueCache<string, VirtualDirectory>();
+    private readonly directories = new Map<string, VirtualDirectory>();
 
     constructor() {
         this.getOrCreateDir("/");
@@ -27,17 +27,17 @@ export class VirtualFileSystemHost implements FileSystemHost {
         path = FileUtils.getStandardizedAbsolutePath(this, path);
         if (this.directories.has(path)) {
             // remove descendant dirs
-            for (const descendantDirPath of getDescendantDirectories(this.directories.getKeys(), path))
-                this.directories.removeByKey(descendantDirPath);
+            for (const descendantDirPath of getDescendantDirectories(this.directories.keys(), path))
+                this.directories.delete(descendantDirPath);
             // remove this dir
-            this.directories.removeByKey(path);
+            this.directories.delete(path);
             return;
         }
 
         const parentDir = this.directories.get(FileUtils.getDirPath(path));
         if (parentDir == null || !parentDir.files.has(path))
             throw new errors.FileNotFoundError(path);
-        parentDir.files.removeByKey(path);
+        parentDir.files.delete(path);
     }
 
     readDirSync(dirPath: string) {
@@ -46,7 +46,7 @@ export class VirtualFileSystemHost implements FileSystemHost {
         if (dir == null)
             throw new errors.DirectoryNotFoundError(dirPath);
 
-        return [...getDirectories(this.directories.getKeys()), ...dir.files.getKeys()];
+        return [...getDirectories(this.directories.keys()), ...dir.files.keys()];
 
         function* getDirectories(dirPaths: IterableIterator<string>) {
             for (const path of dirPaths) {
@@ -115,12 +115,12 @@ export class VirtualFileSystemHost implements FileSystemHost {
         else if (this.directories.has(srcPath)) {
             const moveDirectory = (from: string, to: string) => {
                 this._copyDirInternal(from, to);
-                this.directories.removeByKey(from);
+                this.directories.delete(from);
             };
             moveDirectory(srcPath, destPath);
 
             // move descendant dirs
-            for (const descendantDirPath of getDescendantDirectories(this.directories.getKeys(), srcPath)) {
+            for (const descendantDirPath of getDescendantDirectories(this.directories.keys(), srcPath)) {
                 const relativePath = FileUtils.getRelativePathTo(srcPath, descendantDirPath);
                 moveDirectory(descendantDirPath, FileUtils.pathJoin(destPath, relativePath));
             }
@@ -144,7 +144,7 @@ export class VirtualFileSystemHost implements FileSystemHost {
             this._copyDirInternal(srcPath, destPath);
 
             // copy descendant dirs
-            for (const descendantDirPath of getDescendantDirectories(this.directories.getKeys(), srcPath)) {
+            for (const descendantDirPath of getDescendantDirectories(this.directories.keys(), srcPath)) {
                 const relativePath = FileUtils.getRelativePathTo(srcPath, descendantDirPath);
                 this._copyDirInternal(descendantDirPath, FileUtils.pathJoin(destPath, relativePath));
             }
@@ -157,7 +157,7 @@ export class VirtualFileSystemHost implements FileSystemHost {
         const dir = this.directories.get(from)!;
         const newDir = this.getOrCreateDir(to);
 
-        for (const fileEntry of dir.files.getEntries())
+        for (const fileEntry of dir.files.entries())
             newDir.files.set(FileUtils.pathJoin(to, FileUtils.getBaseName(fileEntry[0])), fileEntry[1]);
     }
 
@@ -191,12 +191,12 @@ export class VirtualFileSystemHost implements FileSystemHost {
     glob(patterns: ReadonlyArray<string>): string[] {
         const filePaths: string[] = [];
 
-        const allFilePaths = ArrayUtils.from(getAllFilePaths(this.directories.getValues()));
+        const allFilePaths = Array.from(getAllFilePaths(this.directories.values()));
         return matchGlobs(allFilePaths, patterns, this.getCurrentDirectory());
 
         function* getAllFilePaths(directories: IterableIterator<VirtualDirectory>) {
             for (const dir of directories) {
-                yield* dir.files.getKeys();
+                yield* dir.files.keys();
             }
         }
     }
@@ -205,7 +205,7 @@ export class VirtualFileSystemHost implements FileSystemHost {
         let dir = this.directories.get(dirPath);
 
         if (dir == null) {
-            dir = { path: dirPath, files: new KeyValueCache<string, string>() };
+            dir = { path: dirPath, files: new Map<string, string>() };
             this.directories.set(dirPath, dir);
             const parentDirPath = FileUtils.getDirPath(dirPath);
             if (parentDirPath !== dirPath)

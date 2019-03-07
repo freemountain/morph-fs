@@ -1,11 +1,22 @@
 {
-    "extends": "./tsconfig.common.json",
     "compilerOptions": {
-        "declaration": false,
+        "target": "es5",
+        "module": "commonjs",
         "strict": true,
+        "sourceMap": false,
+        "declaration": true,
+        "removeComments": false,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "stripInternal": true,
+        "typeRoots": [ "node_modules/@types" ],
+        "types": [ "node", "mocha" ],
+        "downlevelIteration": true,
+        "importHelpers": false,
+        "lib": [ "es2015" ],
         "rootDir": "./src",
         "outDir": "./dist",
-        "plugins": [{ "transform": "ts-nameof", "type": "raw" }]
     },
     "exclude": [
         "./scripts",
@@ -15,5 +26,6 @@
         "./dist-declarations",
         "./dist",
         "node_modules"
-    ]
+    ],
+    "compileOnSave":  true
 }

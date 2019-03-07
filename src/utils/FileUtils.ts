@@ -1,10 +1,11 @@
 ﻿import * as toAbsoluteGlob from "@dsherret/to-absolute-glob";
 import * as path from "path";
-import { FileSystemHost, FileSystemWrapper } from "../fileSystem";
-import { ArrayUtils } from "./ArrayUtils";
-import { StringUtils } from "./StringUtils";
-import globParent = require("glob-parent");
+import { FileSystemHost } from "../fileSystem";
 import isNegatedGlob = require("is-negated-glob");
+
+const isNullOrWhitespace = (str: string | undefined): str is undefined => {
+    return typeof str !== "string" || str.trim().length === 0;
+};
 
 export class FileUtils {
     private static standardizeSlashesRegex = /\\/g;
@@ -33,14 +34,6 @@ export class FileUtils {
     }
 
     /**
-     * Gets if the path is absolute.
-     * @param fileOrDirPath - File or directory path.
-     */
-    static pathIsAbsolute(fileOrDirPath: string) {
-        return path.isAbsolute(fileOrDirPath);
-    }
-
-    /**
      * Gets the standardized absolute path.
      * @param fileSystem - File system.
      * @param fileOrDirPath - Path to standardize.
@@ -53,7 +46,7 @@ export class FileUtils {
             const isAbsolutePath = path.isAbsolute(fileOrDirPath);
             if (isAbsolutePath)
                 return fileOrDirPath;
-            if (!StringUtils.startsWith(fileOrDirPath, "./") && relativeBase != null)
+            if (!fileOrDirPath.startsWith("./") && relativeBase != null)
                 return path.join(relativeBase, fileOrDirPath);
             return path.join(fileSystem.getCurrentDirectory(), fileOrDirPath);
         }
@@ -127,8 +120,8 @@ export class FileUtils {
      * @param startsWithPath - Starts with path.
      */
     static pathStartsWith(fileOrDirPath: string | undefined, startsWithPath: string | undefined) {
-        const isfileOrDirPathEmpty = StringUtils.isNullOrWhitespace(fileOrDirPath);
-        const isStartsWithPathEmpty = StringUtils.isNullOrWhitespace(startsWithPath);
+        const isfileOrDirPathEmpty = isNullOrWhitespace(fileOrDirPath);
+        const isStartsWithPathEmpty = isNullOrWhitespace(startsWithPath);
         const pathItems = FileUtils.splitPathBySlashes(fileOrDirPath);
         const startsWithItems = FileUtils.splitPathBySlashes(startsWithPath);
 
@@ -162,54 +155,13 @@ export class FileUtils {
     static getParentMostPaths(paths: string[]) {
         const finalPaths: string[] = [];
 
-        for (const fileOrDirPath of ArrayUtils.sortByProperty(paths, p => p.length)) {
+
+        for (const fileOrDirPath of paths.sort((a, b) => a.length <= b.length ? -1 : 1)) {
             if (finalPaths.every(p => !FileUtils.pathStartsWith(fileOrDirPath, p)))
                 finalPaths.push(fileOrDirPath);
         }
 
         return finalPaths;
-    }
-
-    /**
-     * Reads a file or returns false if the file doesn't exist.
-     * @param fileSystem - File System.
-     * @param filePath - Path to file.
-     * @param encoding - File encoding.
-     */
-    static async readFileOrNotExists(fileSystem: FileSystemHost, filePath: string, encoding: string) {
-        try {
-            return await fileSystem.readFile(filePath, encoding);
-        } catch (err) {
-            if (!FileUtils.isNotExistsError(err))
-                throw err;
-            return false;
-        }
-    }
-
-    /**
-     * Reads a file synchronously or returns false if the file doesn't exist.
-     * @param fileSystem - File System.
-     * @param filePath - Path to file.
-     * @param encoding - File encoding.
-     */
-    static readFileOrNotExistsSync(fileSystem: FileSystemHost, filePath: string, encoding: string) {
-        try {
-            return fileSystem.readFileSync(filePath, encoding);
-        } catch (err) {
-            if (!FileUtils.isNotExistsError(err))
-                throw err;
-            return false;
-        }
-    }
-
-    /**
-     * Gets the text with a byte order mark.
-     * @param text - Text.
-     */
-    static getTextWithByteOrderMark(text: string) {
-        if (StringUtils.hasBom(text))
-            return text;
-        return "\uFEFF" + text;
     }
 
     /**
@@ -223,52 +175,11 @@ export class FileUtils {
     }
 
     /**
-     * Gets if the path is for the root directory.
-     * @param path - Path.
-     */
-    static isRootDirPath(dirOrFilePath: string) {
-        return dirOrFilePath === FileUtils.getDirPath(dirOrFilePath);
-    }
-
-    /**
-     * Gets the descendant directories of the specified directory.
-     * @param dirPath - Directory path.
-     */
-    static getDescendantDirectories(fileSystemWrapper: FileSystemWrapper, dirPath: string) {
-        // todo: unit tests...
-        return Array.from(getDescendantDirectories(dirPath));
-
-        function* getDescendantDirectories(currentDirPath: string): IterableIterator<string> {
-            const subDirPaths = fileSystemWrapper.readDirSync(currentDirPath).filter(d => fileSystemWrapper.directoryExistsSync(d));
-            for (const subDirPath of subDirPaths) {
-                yield subDirPath;
-                yield* getDescendantDirectories(subDirPath);
-            }
-        }
-    }
-
-    /**
      * Gets the glob as absolute.
      * @param glob - Glob.
      * @param cwd - Current working directory.
      */
     static toAbsoluteGlob(glob: string, cwd: string) {
         return toAbsoluteGlob(glob, { cwd });
-    }
-
-    /**
-     * Gets if the glob is a negated glob.
-     * @param glob - Glob.
-     */
-    static isNegatedGlob(glob: string) {
-        return isNegatedGlob(glob).negated;
-    }
-
-    /**
-     * Gets the glob's directory.
-     * @param glob - Glob.
-     */
-    static getGlobDir(glob: string) {
-        return globParent(glob);
     }
 }
