@@ -43,6 +43,9 @@ jobs:
       - restore_cache:
           keys:
             - v1-dist-{{ .Branch }}-{{ .Revision }}
+      - add_ssh_keys:
+        fingerprints:
+          - "ec:d6:e5:9f:8f:58:5e:d9:11:6b:3b:82:f6:ef:56:1b"
       - run: ./scripts/publish.sh
 
 workflows:
