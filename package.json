@@ -8,8 +8,8 @@
     "dopublish": "yarn run build && npm publish",
     "lint": "tslint \"src/**/*.ts\"",
     "build": "rimraf dist && tsc",
-    "test": "TS_NODE_TRANSPILE_ONLY=\"true\" mocha --opts mocha.opts",
-    "coverage": "TS_NODE_TRANSPILE_ONLY=\"true\" nyc --reporter=lcov mocha --opts mocha.opts",
+    "test": "mocha --opts mocha.opts",
+    "coverage": "nyc --reporter=lcov mocha --opts mocha.opts",
     "maintain-barrels": "barrel-maintainer src"
   },
   "repository": "git+https://github.com/freemountain/morph-fs",
@@ -44,14 +44,17 @@
     "@dsherret/to-absolute-glob": "^2.0.2",
     "fs-extra": "^7.0.0",
     "globby": "^9.1.0",
-    "multimatch": "^3.0.0"
+    "multimatch": "^3.0.0",
+    "to-absolute-glob": "^2.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
     "@types/fs-extra": "^5.0.2",
+    "@types/globby": "^8.0.0",
     "@types/mocha": "^5.2.0",
     "@types/multimatch": "^2.1.2",
     "@types/node": "^6.0.110",
+    "@types/to-absolute-glob": "^2.0.0",
     "barrel-maintainer": "^1.4.0",
     "chai": "^4.1.2",
     "coveralls": "^3.0.1",

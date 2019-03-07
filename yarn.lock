@@ -112,13 +112,20 @@
   dependencies:
     "@types/node" "*"
 
-"@types/glob@^7.1.1":
+"@types/glob@*", "@types/glob@^7.1.1":
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.1.tgz#aa59a1c6e3fbc421e07ccd31a944c30eba521575"
   dependencies:
     "@types/events" "*"
     "@types/minimatch" "*"
     "@types/node" "*"
+
+"@types/globby@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@types/globby/-/globby-8.0.0.tgz#7bd10eaf802e1e11afdb1e5436cf472ddf4c0dd2"
+  dependencies:
+    "@types/glob" "*"
+    fast-glob "^2.0.2"
 
 "@types/minimatch@*":
   version "3.0.3"
@@ -145,6 +152,10 @@
 "@types/node@^6.0.110":
   version "6.14.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.14.4.tgz#d8de576bdeaaafcf54a158af1e38cbb6e6d3db46"
+
+"@types/to-absolute-glob@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/to-absolute-glob/-/to-absolute-glob-2.0.0.tgz#c9fb8bb16509a8080dcfc6da0a2764bfd95e2dd4"
 
 abbrev@1:
   version "1.1.1"
@@ -2643,6 +2654,13 @@ test-exclude@^5.1.0:
     minimatch "^3.0.4"
     read-pkg-up "^4.0.0"
     require-main-filename "^1.0.1"
+
+to-absolute-glob@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/to-absolute-glob/-/to-absolute-glob-2.0.2.tgz#1865f43d9e74b0822db9f145b78cff7d0f7c849b"
+  dependencies:
+    is-absolute "^1.0.0"
+    is-negated-glob "^1.0.0"
 
 to-fast-properties@^2.0.0:
   version "2.0.0"
