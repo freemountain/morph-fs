@@ -43,7 +43,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-dist-{{ .Branch }}-{{ .Revision }}
-      - run: ./scripts/publish
+      - run: ./scripts/publish.sh
 
 workflows:
   version: 2
