@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.0.19](https://github.com/freemountain/morph-fs/compare/0.0.18...0.0.19) (2019-03-08)
+
+
+
 ## [0.0.18](https://github.com/freemountain/morph-fs/compare/0.0.17...0.0.18) (2019-03-08)
 
 
