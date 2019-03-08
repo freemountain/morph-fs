@@ -7,7 +7,7 @@ git_push_cmd="git push --follow-tags origin $current_branch"
 npm_publish_cmd="npm publish"
 last_author=$(git log -1 --pretty=format:'%an')
 
-if [ "$last_author" = "CircleCI"]; then
+if [ "$last_author" = "CircleCI" ]; then
   echo "Skipping CircleCi commit" 1>&2;
   exit
 fi
