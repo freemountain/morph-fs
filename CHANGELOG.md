@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.0.32](https://github.com/freemountain/morph-fs/compare/0.0.31...0.0.32) (2019-03-08)
+
+
+
+## [0.0.31](https://github.com/freemountain/morph-fs/compare/0.0.30...0.0.31) (2019-03-08)
+
+
+
+## [0.0.30](https://github.com/freemountain/morph-fs/compare/0.0.29...0.0.30) (2019-03-08)
+
+
+
+## [0.0.29](https://github.com/freemountain/morph-fs/compare/0.0.28...0.0.29) (2019-03-08)
+
+
+
+## [0.0.28](https://github.com/freemountain/morph-fs/compare/0.0.27...0.0.28) (2019-03-08)
+
+
+
+## [0.0.27](https://github.com/freemountain/morph-fs/compare/0.0.26...0.0.27) (2019-03-08)
+
+
+
+## [0.0.26](https://github.com/freemountain/morph-fs/compare/0.0.25...0.0.26) (2019-03-08)
+
+
+
+## [0.0.25](https://github.com/freemountain/morph-fs/compare/0.0.24...0.0.25) (2019-03-08)
+
+
+
 ## [0.0.24](https://github.com/freemountain/morph-fs/compare/0.0.23...0.0.24) (2019-03-08)
 
 
