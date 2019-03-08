@@ -5,7 +5,12 @@ standard_version_cmd="./node_modules/.bin/standard-version"
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 git_push_cmd="git push --follow-tags origin $current_branch"
 npm_publish_cmd="npm publish"
+last_author=$(git log -1 --pretty=format:'%an')
 
+if [ "$last_author" = "CircleCI"]; then
+  echo "Skipping CircleCi commit" 1>&2;
+  exit
+fi
 
 case $current_branch in
   "release/"*)  standard_version_cmd="$standard_version_cmd --prerelease beta"
