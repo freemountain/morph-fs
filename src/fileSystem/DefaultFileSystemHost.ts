@@ -1,17 +1,27 @@
-﻿import * as nodePath from "path";
+﻿import * as nodeFs from "fs";
+import * as mkdirp from "mkdirp";
+import * as nodePath from "path";
 import * as errors from "../errors";
 import { FileUtils } from "../utils";
 import { FileSystemHost } from "./FileSystemHost";
 
+const copyDir = require("copy-dir");
+
 export class DefaultFileSystemHost implements FileSystemHost {
     // Prevent "fs-extra" and "globby" from being loaded in environments that don't support it (ex. browsers).
     // This means if someone specifies to use a virtual file system then it won't load this.
-    private fs: typeof import ("fs-extra") = require("fs-extra");
     private globby: typeof import ("globby") = require("globby");
+
+    constructor(private root: string) {
+        if(!nodePath.isAbsolute(root)) {
+            throw new errors.AbsolutePathExpectedError(root);
+        }
+
+    }
 
     delete(path: string) {
         return new Promise<void>((resolve, reject) => {
-            this.fs.unlink(path, err => {
+            nodeFs.unlink(path, err => {
                 if (err)
                     reject(this.getFileNotFoundErrorIfNecessary(err, path));
                 else
@@ -20,25 +30,18 @@ export class DefaultFileSystemHost implements FileSystemHost {
         });
     }
 
-    deleteSync(path: string) {
-        try {
-            this.fs.unlinkSync(path);
-        } catch (err) {
-            throw this.getFileNotFoundErrorIfNecessary(err, path);
-        }
-    }
-
-    readDirSync(dirPath: string) {
-        try {
-            return this.fs.readdirSync(dirPath).map(name => FileUtils.pathJoin(dirPath, name));
-        } catch (err) {
-            throw this.getDirectoryNotFoundErrorIfNecessary(err, dirPath);
-        }
+    readDir(dirPath: string) {
+        return new Promise<string[]>((resolve, reject) => nodeFs.readdir(dirPath, (err, files) => {
+            if(err) {
+                return reject(this.getDirectoryNotFoundErrorIfNecessary(err, dirPath));
+            }
+            resolve(files.map(name => FileUtils.pathJoin(dirPath, name)));
+        }));
     }
 
     readFile(filePath: string, encoding = "utf-8") {
         return new Promise<string>((resolve, reject) => {
-            this.fs.readFile(filePath, encoding, (err, data) => {
+            nodeFs.readFile(filePath, encoding, (err, data) => {
                 if (err)
                     reject(this.getFileNotFoundErrorIfNecessary(err, filePath));
                 else
@@ -47,17 +50,9 @@ export class DefaultFileSystemHost implements FileSystemHost {
         });
     }
 
-    readFileSync(filePath: string, encoding = "utf-8") {
-        try {
-            return this.fs.readFileSync(filePath, encoding);
-        } catch (err) {
-            throw this.getFileNotFoundErrorIfNecessary(err, filePath);
-        }
-    }
-
     async writeFile(filePath: string, fileText: string) {
         await new Promise<void>((resolve, reject) => {
-            this.fs.writeFile(filePath, fileText, err => {
+            nodeFs.writeFile(filePath, fileText, err => {
                 if (err)
                     reject(err);
                 else
@@ -66,49 +61,33 @@ export class DefaultFileSystemHost implements FileSystemHost {
         });
     }
 
-    writeFileSync(filePath: string, fileText: string) {
-        this.fs.writeFileSync(filePath, fileText);
-    }
-
     async mkdir(dirPath: string) {
-        try {
-            await this.fs.mkdirp(dirPath);
-        } catch (err) {
-            // ignore if it already exists
-            if (err.code !== "EEXIST")
-                throw err;
-        }
+        await new Promise<void>((resolve, reject) =>  mkdirp(dirPath, (err) => {
+            if(err) {
+                return reject(err);
+            }
+            resolve();
+        }))
     }
 
-    mkdirSync(dirPath: string) {
-        try {
-            this.fs.mkdirpSync(dirPath);
-        } catch (err) {
-            // ignore if it already exists
-            if (err.code !== "EEXIST")
-                throw err;
-        }
+
+    async move(srcPath: string, destPath: string) {
+        await this.copy(srcPath, destPath);
+        await this.delete(srcPath);
     }
 
-    move(srcPath: string, destPath: string) {
-        return this.fs.move(srcPath, destPath, { overwrite: true });
-    }
-
-    moveSync(srcPath: string, destPath: string) {
-        this.fs.moveSync(srcPath, destPath, { overwrite: true });
-    }
-
-    copy(srcPath: string, destPath: string) {
-        return this.fs.copy(srcPath, destPath, { overwrite: true });
-    }
-
-    copySync(srcPath: string, destPath: string) {
-        this.fs.copySync(srcPath, destPath, { overwrite: true });
+    async copy(srcPath: string, destPath: string) {
+        await new Promise((resolve, reject) => copyDir(srcPath, destPath, (err: any) => {
+            if(err){
+                return reject(err);
+            }
+            resolve();
+        }));
     }
 
     fileExists(filePath: string) {
         return new Promise<boolean>((resolve, reject) => {
-            this.fs.stat(filePath, (err, stat) => {
+            nodeFs.stat(filePath, (err, stat) => {
                 if (err)
                     resolve(false);
                 else
@@ -117,31 +96,15 @@ export class DefaultFileSystemHost implements FileSystemHost {
         });
     }
 
-    fileExistsSync(filePath: string) {
-        try {
-            return this.fs.statSync(filePath).isFile();
-        } catch (err) {
-            return false;
-        }
-    }
-
     directoryExists(dirPath: string) {
         return new Promise<boolean>((resolve, reject) => {
-            this.fs.stat(dirPath, (err, stat) => {
+            nodeFs.stat(dirPath, (err, stat) => {
                 if (err)
                     resolve(false);
                 else
                     resolve(stat.isDirectory());
             });
         });
-    }
-
-    directoryExistsSync(dirPath: string) {
-        try {
-            return this.fs.statSync(dirPath).isDirectory();
-        } catch (err) {
-            return false;
-        }
     }
 
     getCurrentDirectory(): string {

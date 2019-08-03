@@ -39,15 +39,16 @@
     "all": true
   },
   "dependencies": {
-    "fs-extra": "^7.0.0",
+    "copy-dir": "^1.1.0",
     "globby": "^9.1.0",
+    "mkdirp": "^0.5.1",
     "multimatch": "^3.0.0",
     "to-absolute-glob": "^2.0.2"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
-    "@types/fs-extra": "^5.0.2",
     "@types/globby": "^8.0.0",
+    "@types/mkdirp": "^0.5.2",
     "@types/mocha": "^5.2.0",
     "@types/multimatch": "^2.1.2",
     "@types/node": "^6.0.110",

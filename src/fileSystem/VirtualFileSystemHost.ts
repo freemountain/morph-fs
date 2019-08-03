@@ -15,15 +15,6 @@ export class VirtualFileSystemHost implements FileSystemHost {
     }
 
     delete(path: string) {
-        try {
-            this.deleteSync(path);
-            return Promise.resolve();
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    }
-
-    deleteSync(path: string) {
         path = FileUtils.getStandardizedAbsolutePath(this, path);
         if (this.directories.has(path)) {
             // remove descendant dirs
@@ -31,22 +22,23 @@ export class VirtualFileSystemHost implements FileSystemHost {
                 this.directories.delete(descendantDirPath);
             // remove this dir
             this.directories.delete(path);
-            return;
+            return Promise.resolve();
         }
 
         const parentDir = this.directories.get(FileUtils.getDirPath(path));
         if (parentDir == null || !parentDir.files.has(path))
-            throw new errors.FileNotFoundError(path);
+            return Promise.reject(new errors.FileNotFoundError(path));
         parentDir.files.delete(path);
+        return Promise.resolve();
     }
 
-    readDirSync(dirPath: string) {
+    readDir(dirPath: string) {
         dirPath = FileUtils.getStandardizedAbsolutePath(this, dirPath);
         const dir = this.directories.get(dirPath);
         if (dir == null)
-            throw new errors.DirectoryNotFoundError(dirPath);
+            return Promise.reject(new errors.DirectoryNotFoundError(dirPath));
 
-        return [...getDirectories(this.directories.keys()), ...dir.files.keys()];
+        return Promise.resolve([...getDirectories(this.directories.keys()), ...dir.files.keys()]);
 
         function* getDirectories(dirPaths: IterableIterator<string>) {
             for (const path of dirPaths) {
@@ -58,59 +50,38 @@ export class VirtualFileSystemHost implements FileSystemHost {
     }
 
     readFile(filePath: string, encoding = "utf-8") {
-        try {
-            return Promise.resolve(this.readFileSync(filePath, encoding));
-        } catch (err) {
-            return Promise.reject(err);
-        }
-    }
-
-    readFileSync(filePath: string, encoding = "utf-8") {
         filePath = FileUtils.getStandardizedAbsolutePath(this, filePath);
         const parentDir = this.directories.get(FileUtils.getDirPath(filePath));
         if (parentDir == null)
-            throw new errors.FileNotFoundError(filePath);
+            return Promise.reject(new errors.FileNotFoundError(filePath));
 
         const fileText = parentDir.files.get(filePath);
         if (fileText === undefined)
-            throw new errors.FileNotFoundError(filePath);
-        return fileText;
+            return Promise.reject(new errors.FileNotFoundError(filePath));
+        return Promise.resolve(fileText);
     }
 
     writeFile(filePath: string, fileText: string) {
-        this.writeFileSync(filePath, fileText);
-        return Promise.resolve();
-    }
-
-    writeFileSync(filePath: string, fileText: string) {
         filePath = FileUtils.getStandardizedAbsolutePath(this, filePath);
         const dirPath = FileUtils.getDirPath(filePath);
         this.getOrCreateDir(dirPath).files.set(filePath, fileText);
+        return Promise.resolve();
     }
 
     mkdir(dirPath: string) {
-        this.mkdirSync(dirPath);
-        return Promise.resolve();
-    }
-
-    mkdirSync(dirPath: string) {
         dirPath = FileUtils.getStandardizedAbsolutePath(this, dirPath);
         this.getOrCreateDir(dirPath);
-    }
-
-    move(srcPath: string, destPath: string) {
-        this.moveSync(srcPath, destPath);
         return Promise.resolve();
     }
 
-    moveSync(srcPath: string, destPath: string) {
+    async move(srcPath: string, destPath: string) {
         srcPath = FileUtils.getStandardizedAbsolutePath(this, srcPath);
         destPath = FileUtils.getStandardizedAbsolutePath(this, destPath);
 
-        if (this.fileExistsSync(srcPath)) {
-            const fileText = this.readFileSync(srcPath);
-            this.deleteSync(srcPath);
-            this.writeFileSync(destPath, fileText);
+        if (await this.fileExists(srcPath)) {
+            const fileText = await this.readFile(srcPath);
+            await this.delete(srcPath);
+            await this.writeFile(destPath, fileText);
         }
         else if (this.directories.has(srcPath)) {
             const moveDirectory = (from: string, to: string) => {
@@ -129,17 +100,12 @@ export class VirtualFileSystemHost implements FileSystemHost {
             throw new errors.PathNotFoundError(srcPath);
     }
 
-    copy(srcPath: string, destPath: string) {
-        this.copySync(srcPath, destPath);
-        return Promise.resolve();
-    }
-
-    copySync(srcPath: string, destPath: string) {
+    async copy(srcPath: string, destPath: string) {
         srcPath = FileUtils.getStandardizedAbsolutePath(this, srcPath);
         destPath = FileUtils.getStandardizedAbsolutePath(this, destPath);
 
-        if (this.fileExistsSync(srcPath))
-            this.writeFileSync(destPath, this.readFileSync(srcPath));
+        if (await this.fileExists(srcPath))
+            await this.writeFile(destPath, await this.readFile(srcPath));
         else if (this.directories.has(srcPath)) {
             this._copyDirInternal(srcPath, destPath);
 
@@ -162,26 +128,18 @@ export class VirtualFileSystemHost implements FileSystemHost {
     }
 
     fileExists(filePath: string) {
-        return Promise.resolve<boolean>(this.fileExistsSync(filePath));
-    }
-
-    fileExistsSync(filePath: string) {
         filePath = FileUtils.getStandardizedAbsolutePath(this, filePath);
         const dirPath = FileUtils.getDirPath(filePath);
         const dir = this.directories.get(dirPath);
         if (dir == null)
-            return false;
+            return Promise.resolve(false);
 
-        return dir.files.has(filePath);
+        return Promise.resolve(dir.files.has(filePath));
     }
 
     directoryExists(dirPath: string) {
-        return Promise.resolve<boolean>(this.directoryExistsSync(dirPath));
-    }
-
-    directoryExistsSync(dirPath: string) {
         dirPath = FileUtils.getStandardizedAbsolutePath(this, dirPath);
-        return this.directories.has(dirPath);
+        return Promise.resolve(this.directories.has(dirPath));
     }
 
     getCurrentDirectory() {

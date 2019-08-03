@@ -1,21 +1,21 @@
 ﻿export interface FileSystemHost {
     delete(path: string): Promise<void>;
-    deleteSync(path: string): void;
-    readDirSync(dirPath: string): string[];
+    //deleteSync(path: string): void;
+    readDir(dirPath: string): Promise<string[]>;
     readFile(filePath: string, encoding?: string): Promise<string>;
-    readFileSync(filePath: string, encoding?: string): string;
+    //readFileSync(filePath: string, encoding?: string): string;
     writeFile(filePath: string, fileText: string): Promise<void>;
-    writeFileSync(filePath: string, fileText: string): void;
+    //writeFileSync(filePath: string, fileText: string): void;
     mkdir(dirPath: string): Promise<void>;
-    mkdirSync(dirPath: string): void;
+    //mkdirSync(dirPath: string): void;
     move(srcPath: string, destPath: string): Promise<void>;
-    moveSync(srcPath: string, destPath: string): void;
+    //moveSync(srcPath: string, destPath: string): void;
     copy(srcPath: string, destPath: string): Promise<void>;
-    copySync(srcPath: string, destPath: string): void;
+    //copySync(srcPath: string, destPath: string): void;
     fileExists(filePath: string): Promise<boolean>;
-    fileExistsSync(filePath: string): boolean;
+    //fileExistsSync(filePath: string): boolean;
     directoryExists(dirPath: string): Promise<boolean>;
-    directoryExistsSync(dirPath: string): boolean;
+    //directoryExistsSync(dirPath: string): boolean;
     getCurrentDirectory(): string;
     glob(patterns: ReadonlyArray<string>): string[];
     /** Gets if this file system is case sensitive. Defaults to true if not implemented. */
